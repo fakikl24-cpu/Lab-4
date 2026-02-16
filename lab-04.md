@@ -287,24 +287,34 @@ nc_plot + theme_bw()
 
 ![](lab-04_files/figure-gfm/nc-obs-1.png)<!-- -->
 
-Remove this text, and add your answer for Exercise 2 here. Add code
-chunks as needed. Don’t forget to label your code chunk. Do not use
-spaces in code chunk labels.
+Visually, there are quite a few La Quinta’s near Denny’s but they’re not
+exclusively next to each other. Similarly, there are plenty of Denny’s
+that stand alone from La Quinta’s. So I wouldn’t tell people that there
+will always be a La Quinta near a Denny’s. But maybe in a more populated
+area, you are likely to see them close by.
 
-### Exercise 3
+### Exercise 12
 
-…
+``` r
+tx_dn <- dennys %>%
+  filter(state == "TX")
 
-### Exercise 4
+tx_lq <- laquinta %>% 
+  filter(state == "TX")
 
-…
+tx_dn_lq <- bind_rows(tx_dn, tx_lq)
 
-### Exercise 5
+tx_plot <- ggplot(tx_dn_lq, mapping = aes(
+  x = longitude, 
+  y = latitude, 
+  color = establishment
+)) + 
+  geom_point(alpha = 0.1)
 
-…
+tx_plot + theme_bw()
+```
 
-### Exercise 6
+![](lab-04_files/figure-gfm/texas-obs-1.png)<!-- -->
 
-…
-
-Add exercise headings as needed.
+Visually, yes, Hedberg’s joke does appear to hold. Every La Quinta has a
+Denny’s nearby.
