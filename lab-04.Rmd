@@ -1,7 +1,7 @@
 ---
 title: "Lab 04 - La Quinta is Spanish for next to Denny's, Pt. 1"
-author: "Insert your name here"
-date: "Insert date here"
+author: "Kryschelle Fakir"
+date: "2/16/2024"
 output: github_document
 ---
 
@@ -12,18 +12,157 @@ library(tidyverse)
 library(dsbox) 
 ```
 
+
 ```{r load-data, message = FALSE}
 states <- read_csv("data/states.csv")
 ```
 
-### Exercise 1
+### Exercise 1 and 2
 
-Remove this text, and add your answer for Exercise 1 here.
-Add code chunks as needed.
-Don't forget to label your code chunk.
-Do not use spaces in code chunk labels.
+```{r exercise-1-and-2}
 
-### Exercise 2
+glimpse(dennys)
+view(dennys)
+glimpse(laquinta)
+view(laquinta)
+
+```
+For Dennys, the dataset has 6 columns and 1643 rows. Each row is a specific Dennys' location and the variables are address, city, state, zip code, longitude, and latitude. For LaQuinta, the dataset has 6 columns and 909 rows. Each row is a specific LaQuinta location and the variables are address, city, state, sip code, longtiude, and latitude. 
+
+
+### Exercise 3
+
+There are a decent number of LaQuinta locations outside of the U.S. There are 7 LaQuinta's in China, 3 in New Zealand, 1 in Georgia, 5 in Turkey, 2 in the United Arab Emirates, 1 in Colombia, and 1 in Ecuador. As for Denny's, just by going based off of the website, there does not appear to be any locations outside of the US. However, there are 1257 US locations listed on the website but 1643 rows. This discrepancy makes me think that there are locations outside of the US that aren't explicity mentioned on the website. That or there's been lots of closings since the initial making of this dataset. 
+
+
+### Exercise 4
+To determine whether a location is outside of the US, perhaps we could filter out cases that have N/A for state. 
+
+### Exercise 5
+```{r filter-dennys-non-US}
+
+dennys %>%
+  filter(!(state %in% states$abbreviation))
+```
+There are no Denny locations outside of the US. 
+
+
+### Exercise 6
+```{r add-country-to-dennyus}
+
+dennys <- dennys %>%
+  mutate(country = "United States")
+```
+
+
+### Exercise 7
+```{r laquinta-filter-non-us}
+
+laquinta %>%
+  filter(!(state %in% states$abbreviation))
+
+```
+
+
+### Exercise 8
+```{r case-when-laquinta}
+
+laquinta <- laquinta %>%
+  mutate(country = case_when(
+    state %in% state.abb ~ "United States",
+    state %in% c("ON", "BC") ~ "Canada",
+    state == "ANT" ~ "Colombia",
+    state == "AG" ~ "Mexico", 
+    state == "QR" ~ "Mexico", 
+    state == "CH" ~ "Mexico", 
+    state == "NL" ~ "Mexico",
+    state == "VE" ~ "Mexico", 
+    state == "PU" ~ "Mexico", 
+    state == "SL" ~ "Mexico",
+    state == "FM" ~ "Honduras"
+  ))
+
+```
+
+### Exercise 9
+
+```{r filter-lq-and-dn-us}
+
+laquinta <- laquinta %>%
+  filter(country == "United States")
+
+laquinta %>%
+  count(state) %>%
+  arrange(n)
+
+dennys %>% 
+  count(state) %>%
+  arrange(n)
+  
+
+```
+The state with the most LaQuinta locations is Texas and the state with the least LaQuinta locations is Maine. This makes sense to me honestly; Maine is way up north and I've always conceptualized the La Quinta as a distinctly southern/southwestern business. 
+
+The state with the most Dennys' locations is California and the state with the least Dennys' locations is Delaware. These numbers make some sense! Delaware is a smaller state, whereas California is huge, with lots of potential for more locations. I thought that Florida would be the state with the most locations though because I feel like their food and business would appeal to Floridians and others living in the deep south. 
+
+
+### Exercise 10 
+
+```{r count-denny-pthous}
+dennys %>%
+  count(state) %>%
+  inner_join(states, by = c("state" = "abbreviation")) %>%
+  arrange(n)
+
+laquinta %>%
+  count(state) %>%
+  inner_join(states, by = c("state" = "abbreviation")) %>%
+  arrange(n)
+```
+
+California, Texas, and Florida have the most Dennys' locations per thousand square miles. 
+
+Texas, Florida, and California have the most La Quinta's per though square miles. 
+
+```{r establishment}
+
+dennys <- dennys %>%
+  mutate(establishment = "Denny's")
+laquinta <- laquinta %>%
+  mutate(establishment = "La Quinta")
+
+dn_lq <- bind_rows(dennys, laquinta)
+
+ggplot(dn_lq, mapping = aes(
+  x = longitude, 
+  y = latitude, 
+  color = establishment
+)) + 
+  geom_point()
+```
+
+### Exercise 11
+
+```{r nc-obs}
+
+nc_dn <- dennys %>%
+  filter(state == "NC")
+
+nc_lq <- laquinta %>% 
+  filter(state == "NC")
+
+nc_dn_lq <- bind_rows(nc_dn, nc_lq)
+
+nc_plot <- ggplot(nc_dn_lq, mapping = aes(
+  x = longitude, 
+  y = latitude, 
+  color = establishment
+)) + 
+  geom_point(alpha = 0.5)
+
+nc_plot + theme_bw()
+
+```
 
 Remove this text, and add your answer for Exercise 2 here.
 Add code chunks as needed.
